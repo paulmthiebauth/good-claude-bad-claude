@@ -1,4 +1,4 @@
-# good-claude-bad-claude — Plugin Design Spec
+# good-claude-bad-claude - Plugin Design Spec
 
 **Date:** 2026-06-28
 **Status:** Approved design, pre-implementation
@@ -20,7 +20,7 @@ confirmation POST it to the configured Google Form.
 ## Goals
 
 - One-line capture of good/bad code examples during normal work.
-- Zero form-specific data committed to the repo — the plugin is generic and
+- Zero form-specific data committed to the repo - the plugin is generic and
   reusable; the destination form is configured per-user.
 - Minimal manual input: infer repo, stack, context, and submitter email
   automatically; only the two code snippets are strictly required.
@@ -43,9 +43,9 @@ confirmation POST it to the configured Google Form.
 
 Both entrypoints run the same underlying flow:
 
-- **Natural language** — a skill whose description triggers on "good claude" /
+- **Natural language** - a skill whose description triggers on "good claude" /
   "bad claude" said in chat.
-- **Slash commands** — `/good-claude` and `/bad-claude` invoke the same flow for
+- **Slash commands** - `/good-claude` and `/bad-claude` invoke the same flow for
   users who prefer to type a command. `good-claude` frames good-first;
   `bad-claude` frames bad-first. Both collect *both* examples.
 
@@ -78,7 +78,7 @@ good-claude-bad-claude/
 Nothing form-specific is committed. Per-user state lives in two places, with a
 clear source of truth:
 
-1. **`userConfig` in `plugin.json`** (enable-time prompt, best-effort seed) —
+1. **`userConfig` in `plugin.json`** (enable-time prompt, best-effort seed) - 
    declares a single `form_url` field so Claude Code prompts the user for it when
    they *enable* the plugin (the closest platform mechanism to "ask on install").
    No default value (a default would mean committing the URL).
@@ -99,11 +99,11 @@ clear source of truth:
    commands but **not** guaranteed for scripts a skill runs. So scripts never read
    it directly; it is only used to *seed* setup when accessible.
 
-2. **`${CLAUDE_PLUGIN_DATA}/config.json`** (runtime source of truth) — written by
+2. **`${CLAUDE_PLUGIN_DATA}/config.json`** (runtime source of truth) - written by
    first-run setup, read by every submission. `${CLAUDE_PLUGIN_DATA}`
    (`~/.claude/plugins/data/<plugin-id>/`) is the Claude-provided per-user data
    dir; it survives plugin updates and is removed on uninstall. Holds the form
-   URL, the resolved field mapping, and the email flag — everything a submission
+   URL, the resolved field mapping, and the email flag - everything a submission
    needs (the skill reads it and passes the values to the submit script as flags):
 
    ```json
@@ -111,11 +111,11 @@ clear source of truth:
      "form_url": "https://docs.google.com/forms/d/e/…/formResponse",
      "collects_email": true,
      "fields": {
-       "repo":    "entry.69374140",
-       "stack":   "entry.436573181",
-       "context": "entry.1540025353",
-       "good":    "entry.641172771",
-       "bad":     "entry.2076894075"
+       "repo":    "entry.<repo-id>",
+       "stack":   "entry.<stack-id>",
+       "context": "entry.<context-id>",
+       "good":    "entry.<good-id>",
+       "bad":     "entry.<bad-id>"
      }
    }
    ```
@@ -128,7 +128,7 @@ the user otherwise), then runs field discovery.
 
 Because `entry.*` IDs are form-specific, they cannot be committed. On first use
 (or whenever `config.json` is missing/incomplete), the skill performs discovery
-**Claude-driven** — Claude fetches and parses the form rather than a bundled
+**Claude-driven** - Claude fetches and parses the form rather than a bundled
 parser script, which keeps the only runtime dependency `curl` (robustly parsing
 Google's form data in portable shell is fragile, and Claude is already in the
 loop on first run):
@@ -147,15 +147,15 @@ then caches the result. Subsequent submissions skip discovery.
 
 ## Submission Flow (SKILL.md)
 
-1. **Setup check** — if `config.json` is missing or incomplete, run inline setup
+1. **Setup check** - if `config.json` is missing or incomplete, run inline setup
    (prompt for URL if needed → discover → confirm mapping → cache), then continue.
-2. **Collect snippets** — "What's the good example?" then "What's the bad
+2. **Collect snippets** - "What's the good example?" then "What's the bad
    example?" (order flips for `bad claude`). User may paste code or point at
    something from the conversation.
-3. **Whys (optional, draftable)** — for each example the user picks one of: (a)
+3. **Whys (optional, draftable)** - for each example the user picks one of: (a)
    write their own why, (b) have the plugin draft one, or (c) skip. When drafted,
    the plugin infers the why from the snippet + context, shows the drafted whys,
-   and asks **"Does this sound correct?"** — the user accepts, edits either, or
+   and asks **"Does this sound correct?"** - the user accepts, edits either, or
    discards. This confirmation happens here, before the final preview. A why that
    is neither written nor accepted is submitted as `(to be inferred)`. No inferred
    why is ever submitted without explicit confirmation.
@@ -168,9 +168,9 @@ then caches the result. Subsequent submissions skip discovery.
      snippet and current activity.
    - `email`: `git config user.email` (sent via the form's special
      `emailAddress` param when the form collects email).
-5. **Preview & confirm** — show the full assembled submission and let the user
+5. **Preview & confirm** - show the full assembled submission and let the user
    correct the inferred `stack`/`context` before sending.
-6. **Submit** — run `submit_example.sh`; report ✅/❌ honestly.
+6. **Submit** - run `submit_example.sh`; report ✅/❌ honestly.
 
 ### Good/Bad field format
 
@@ -188,7 +188,7 @@ WHY:
 
 A thin, **flag-driven** `curl` wrapper with no dependency beyond `curl` itself.
 The skill reads `${CLAUDE_PLUGIN_DATA}/config.json` (Claude parses JSON natively)
-and passes everything to the script as flags — the form URL, the five `entry.*`
+and passes everything to the script as flags - the form URL, the five `entry.*`
 field IDs, the five content values, and `--email` (only when the form collects
 email). The script URL-encodes all values, sends `emailAddress` when `--email` is
 given, and keeps a `--dry-run` mode that prints the curl invocation without
@@ -209,7 +209,7 @@ needs no JSON parser, so it runs anywhere `curl` exists.
 
 ## Testing
 
-- `scripts/test_submit.sh` — a plain-Bash test (no `bats` dependency) covering
+- `scripts/test_submit.sh` - a plain-Bash test (no `bats` dependency) covering
   `submit_example.sh` field-to-value mapping, email inclusion/omission, and
   argument validation via `--dry-run` (no network). Runnable in CI.
 - The skill flow and Claude-driven discovery get a manual test checklist in the

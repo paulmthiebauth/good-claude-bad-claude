@@ -13,7 +13,7 @@
 Every task implicitly includes these. Values copied from `docs/design.md`:
 
 - No form-specific data is committed: no form URL and no `entry.*` IDs anywhere in the repo.
-- Bundled scripts depend only on `curl` + Bash/coreutils — they must run on any engineer's machine with no `jq`/`python`/`ruby`/`node`.
+- Bundled scripts depend only on `curl` + Bash/coreutils - they must run on any engineer's machine with no `jq`/`python`/`ruby`/`node`.
 - Per-user runtime config lives at `${CLAUDE_PLUGIN_DATA}/config.json`; bundled scripts are referenced via `${CLAUDE_PLUGIN_ROOT}`.
 - Names are exact: plugin `good-claude-bad-claude`, skill `submitting-examples`, commands `/good-claude` and `/bad-claude`.
 - Good/bad paragraph fields are submitted in this exact format:
@@ -151,7 +151,7 @@ Run:
 chmod +x scripts/test_submit.sh
 ./scripts/test_submit.sh
 ```
-Expected: FAIL — `submit_example.sh` does not exist yet (errors / `fail` > 0).
+Expected: FAIL - `submit_example.sh` does not exist yet (errors / `fail` > 0).
 
 - [ ] **Step 3: Implement `scripts/submit_example.sh`**
 
@@ -246,7 +246,7 @@ Run:
 chmod +x scripts/submit_example.sh
 ./scripts/test_submit.sh
 ```
-Expected: PASS — final line `pass=6 fail=0`, exit code 0.
+Expected: PASS - final line `pass=6 fail=0`, exit code 0.
 
 - [ ] **Step 5: Commit**
 
@@ -280,7 +280,7 @@ Capture one good example and one bad example of code or behavior and submit them
 to the team's Google Form. Both examples are always collected; "good claude" just
 asks for the good one first, "bad claude" asks for the bad one first.
 
-## Step 0 — Ensure config exists (setup + discovery)
+## Step 0 - Ensure config exists (setup + discovery)
 
 Read `${CLAUDE_PLUGIN_DATA}/config.json`.
 
@@ -293,7 +293,7 @@ Read `${CLAUDE_PLUGIN_DATA}/config.json`.
      `curl -sL "<viewform-url>"` (a `/viewform` URL is expected).
   3. In the HTML, find the `FB_PUBLIC_LOAD_DATA_` array. For each question extract
      its visible text and its `entry.<id>` (the numeric id in the question's field
-     descriptor). Also note whether the form collects email (an `type="email"`
+     descriptor). Also note whether the form collects email (a `type="email"`
      input is present).
   4. Map questions to fields by keyword on the question text:
      `repository` → `repo`, `language`/`stack` → `stack`, `context` → `context`,
@@ -316,14 +316,14 @@ Read `${CLAUDE_PLUGIN_DATA}/config.json`.
      }
      ```
 
-## Step 1 — Collect the two snippets
+## Step 1 - Collect the two snippets
 
 Ask for the good example first (for "good claude") or the bad example first (for
 "bad claude"), then the other. The user may paste code or point at something from
-the conversation ("the test I just wrote") — capture that snippet verbatim. Do not
+the conversation ("the test I just wrote") - capture that snippet verbatim. Do not
 submit if either snippet is empty; re-ask.
 
-## Step 2 — Whys (optional, draftable)
+## Step 2 - Whys (optional, draftable)
 
 For each example, the user picks one of:
 - write their own why,
@@ -344,22 +344,22 @@ WHY:
 <the why, or (to be inferred)>
 ```
 
-## Step 3 — Infer the context fields
+## Step 3 - Infer the context fields
 
 - `repo`: `basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"`
-- `stack`: from repo signals — `Gemfile` → Ruby/Rails, `package.json` → JS/React,
+- `stack`: from repo signals - `Gemfile` → Ruby/Rails, `package.json` → JS/React,
   `go.mod` → Go, `pyproject.toml`/`requirements.txt` → Python, etc.
 - `context`: a short label such as "rails testing" or "react testing", inferred
   from the snippet and what the user is doing.
 - `email`: `git config user.email` (used only if `collects_email` is true).
 
-## Step 4 — Preview & confirm
+## Step 4 - Preview & confirm
 
 Show the full assembled submission: repo, stack, context, the good field, the bad
 field, and the email. Let the user correct the inferred `stack`/`context`. Ask for
 a final yes before sending.
 
-## Step 5 — Submit
+## Step 5 - Submit
 
 Read `form_url` and `fields` from `${CLAUDE_PLUGIN_DATA}/config.json` and run:
 
@@ -464,7 +464,7 @@ git commit -m "feat: add /good-claude and /bad-claude slash commands"
 # good-claude-bad-claude
 
 A Claude Code plugin to capture "good vs bad" code examples and submit them to a
-shared Google Form — fuel for team style guides.
+shared Google Form - fuel for team style guides.
 
 Say **good claude** or **bad claude** (or run `/good-claude` / `/bad-claude`).
 The plugin asks for a good example and a bad example, optionally drafts a *why*
@@ -498,7 +498,7 @@ the field IDs from the form URL on first use. Set the form to **collect email
 
 ## For maintainers (forking)
 
-1. Fork this repo under your own GitHub user or org — that is `<owner>` above.
+1. Fork this repo under your own GitHub user or org - that is `<owner>` above.
 2. Create your Google Form with the five questions and share its `/viewform` URL
    with your team.
 3. (Optional) Make the fork public or host it under an org for wider rollout; a
@@ -563,7 +563,7 @@ populated. Delete the test row afterward.
 
 - [ ] **Step 4: Verify config reuse**
 
-Run `good claude` again. Expected: no rediscovery — it reads the existing
+Run `good claude` again. Expected: no rediscovery - it reads the existing
 `config.json` and goes straight to collecting snippets.
 
 - [ ] **Step 5: Record results**
