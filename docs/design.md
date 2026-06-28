@@ -111,11 +111,11 @@ clear source of truth:
      "form_url": "https://docs.google.com/forms/d/e/…/formResponse",
      "collects_email": true,
      "fields": {
-       "repo":    "entry.69374140",
-       "stack":   "entry.436573181",
-       "context": "entry.1540025353",
-       "good":    "entry.641172771",
-       "bad":     "entry.2076894075"
+       "repo":    "entry.<repo-id>",
+       "stack":   "entry.<stack-id>",
+       "context": "entry.<context-id>",
+       "good":    "entry.<good-id>",
+       "bad":     "entry.<bad-id>"
      }
    }
    ```

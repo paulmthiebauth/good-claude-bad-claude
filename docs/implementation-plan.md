@@ -293,7 +293,7 @@ Read `${CLAUDE_PLUGIN_DATA}/config.json`.
      `curl -sL "<viewform-url>"` (a `/viewform` URL is expected).
   3. In the HTML, find the `FB_PUBLIC_LOAD_DATA_` array. For each question extract
      its visible text and its `entry.<id>` (the numeric id in the question's field
-     descriptor). Also note whether the form collects email (an `type="email"`
+     descriptor). Also note whether the form collects email (a `type="email"`
      input is present).
   4. Map questions to fields by keyword on the question text:
      `repository` → `repo`, `language`/`stack` → `stack`, `context` → `context`,
