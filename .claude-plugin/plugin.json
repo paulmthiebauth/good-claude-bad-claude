@@ -1,0 +1,13 @@
+{
+  "name": "good-claude-bad-claude",
+  "description": "Capture good vs bad code examples and submit them to a shared Google Form to power team style guides.",
+  "version": "0.1.0",
+  "keywords": ["style-guide", "code-review", "examples", "google-forms"],
+  "userConfig": {
+    "form_url": {
+      "type": "string",
+      "title": "Google Form URL",
+      "description": "The viewform URL of the Google Form to submit examples to."
+    }
+  }
+}
