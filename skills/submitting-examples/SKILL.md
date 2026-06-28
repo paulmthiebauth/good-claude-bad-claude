@@ -9,7 +9,7 @@ Capture one good example and one bad example of code or behavior and submit them
 to the team's Google Form. Both examples are always collected; "good claude" just
 asks for the good one first, "bad claude" asks for the bad one first.
 
-## Step 0 — Ensure config exists (setup + discovery)
+## Step 0 - Ensure config exists (setup + discovery)
 
 Read `${CLAUDE_PLUGIN_DATA}/config.json`.
 
@@ -45,14 +45,14 @@ Read `${CLAUDE_PLUGIN_DATA}/config.json`.
      }
      ```
 
-## Step 1 — Collect the two snippets
+## Step 1 - Collect the two snippets
 
 Ask for the good example first (for "good claude") or the bad example first (for
 "bad claude"), then the other. The user may paste code or point at something from
-the conversation ("the test I just wrote") — capture that snippet verbatim. Do not
+the conversation ("the test I just wrote") - capture that snippet verbatim. Do not
 submit if either snippet is empty; re-ask.
 
-## Step 2 — Whys (optional, draftable)
+## Step 2 - Whys (optional, draftable)
 
 For each example, the user picks one of:
 - write their own why,
@@ -73,22 +73,22 @@ WHY:
 <the why, or (to be inferred)>
 ```
 
-## Step 3 — Infer the context fields
+## Step 3 - Infer the context fields
 
 - `repo`: `basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"`
-- `stack`: from repo signals — `Gemfile` → Ruby/Rails, `package.json` → JS/React,
+- `stack`: from repo signals - `Gemfile` → Ruby/Rails, `package.json` → JS/React,
   `go.mod` → Go, `pyproject.toml`/`requirements.txt` → Python, etc.
 - `context`: a short label such as "rails testing" or "react testing", inferred
   from the snippet and what the user is doing.
 - `email`: `git config user.email` (used only if `collects_email` is true).
 
-## Step 4 — Preview & confirm
+## Step 4 - Preview & confirm
 
 Show the full assembled submission: repo, stack, context, the good field, the bad
 field, and the email. Let the user correct the inferred `stack`/`context`. Ask for
 a final yes before sending.
 
-## Step 5 — Submit
+## Step 5 - Submit
 
 Read `form_url` and `fields` from `${CLAUDE_PLUGIN_DATA}/config.json` and run:
 
