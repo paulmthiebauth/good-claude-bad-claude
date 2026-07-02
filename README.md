@@ -6,7 +6,8 @@ shared Google Form - fuel for team style guides.
 Say **good claude** or **bad claude** (or run `/good-claude` / `/bad-claude`).
 The plugin asks for a good example and a bad example, optionally drafts a *why*
 for each (with your confirmation), infers your repo / stack / context, previews
-the submission, and posts it to your form.
+the submission, and posts it to your form. It can then also save the lesson as a
+personal *apply-now* rule so you benefit immediately - see below.
 
 ## Install
 
@@ -24,7 +25,23 @@ Nothing form-specific is stored in this repo.
 1. Say `good claude` (or `bad claude`), or run `/good-claude`.
 2. Provide the good example, then the bad example.
 3. Optionally add or have a *why* drafted for each.
-4. Review the preview and confirm. Done.
+4. Review the preview and confirm - it posts to the form.
+5. Optionally save the lesson as a personal *apply-now* rule (project / global / no).
+
+## Apply-now memory
+
+The Google Form feeds the team's *future* style guides. To get value immediately,
+the plugin can also save the lesson as a personal rule that Claude applies right
+away. After submitting, it synthesizes a short "when X, prefer Y, not Z" rule and
+asks where to keep it:
+
+- **Project** - saved to this repo's Claude memory: personal to you, scoped to the
+  repo, and never committed (it lives under `~/.claude`, not in the repo).
+- **Global** - appended to `~/.claude/CLAUDE.md`, so it applies in every repo.
+- **No** - skip; only the form submission happens.
+
+Project memory uses Claude Code's built-in auto-memory (v2.1.59+); on older
+versions, use the global option.
 
 ## Your Google Form
 
@@ -59,3 +76,6 @@ Run the script tests:
 - [ ] Preview shows repo / stack / context / good / bad / email; submitting returns
       `OK Submitted` and a row appears in the form.
 - [ ] A second run reuses `config.json` (no rediscovery).
+- [ ] After submit: choosing **Project** writes a rule to project memory and a
+      pointer in `MEMORY.md`; **Global** appends to `~/.claude/CLAUDE.md`; **No**
+      writes nothing.
