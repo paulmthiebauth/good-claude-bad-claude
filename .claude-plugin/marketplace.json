@@ -5,8 +5,7 @@
   "plugins": [
     {
       "name": "good-claude-bad-claude",
-      "description": "Capture good vs bad code examples and submit them to a shared Google Form.",
-      "version": "0.1.0",
+      "description": "Capture good vs bad code examples, submit them to a shared Google Form, and optionally save a personal apply-now rule to Claude memory.",
       "source": "./"
     }
   ]

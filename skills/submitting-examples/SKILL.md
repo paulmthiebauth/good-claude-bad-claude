@@ -1,13 +1,16 @@
 ---
 name: submitting-examples
-description: Use when the user says "good claude" or "bad claude", or runs /good-claude or /bad-claude. Captures a good vs bad code example through a short guided flow and submits it to the configured Google Form.
+description: Use when the user says "good claude" or "bad claude", or runs /good-claude or /bad-claude. Captures a good vs bad code example through a short guided flow, submits it to the configured Google Form, and optionally saves a personal "apply-now" rule to Claude memory so the lesson takes effect immediately.
 ---
 
 # Submitting Good/Bad Code Examples
 
 Capture one good example and one bad example of code or behavior and submit them
 to the team's Google Form. Both examples are always collected; "good claude" just
-asks for the good one first, "bad claude" asks for the bad one first.
+asks for the good one first, "bad claude" asks for the bad one first. After
+submitting, you can optionally save a personal "apply-now" rule to your Claude
+memory so the lesson takes effect immediately, without waiting for a formal style
+guide (see Step 6).
 
 ## Step 0 - Ensure config exists (setup + discovery)
 
@@ -107,6 +110,33 @@ Run it once with `--dry-run` appended if you want to show the user the exact
 request first. Report the result honestly: `OK Submitted` on success, or the
 failure (never claim success on a non-200).
 
+## Step 6 - Save an "apply-now" rule (optional)
+
+The Google Form feeds the team's *future* style guides. This step gives the
+submitter an *immediate* benefit: a personal rule Claude applies right away.
+
+1. Synthesize one concise, imperative rule from the example:
+   `When <context>, prefer <good>; avoid <bad>. Why: <why>.`
+   Use the accepted why; if it was skipped, infer a brief one.
+2. Show the rule and ask where to save it:
+   - **A) Project memory** - personal to you, scoped to this repo, not committed.
+   - **B) Global memory** - applies to you in every repo.
+   - **C) Don't save.**
+3. **On A:** save it to this project's built-in Claude auto-memory - do NOT
+   hardcode `~/.claude/projects/...`; use the project memory that Claude Code
+   manages. Write the full rule as a topic memory file with frontmatter (`name`,
+   `description`, `metadata.type: feedback`) and a body with **Why:** and **How to
+   apply:** lines, then add a concise, actionable one-line pointer to `MEMORY.md`.
+   The pointer line must carry the gist, since only the top of `MEMORY.md`
+   auto-loads. If a topic file already covers this subject, update it instead of
+   duplicating.
+   **On B:** append the rule to `~/.claude/CLAUDE.md` under the heading
+   `## Good/Bad conventions (via good-claude-bad-claude)` (create the heading if
+   missing); skip if an identical line already exists.
+   **On C:** do nothing.
+
+This step is additive: it never changes or blocks the Step 5 form submission.
+
 ## Error handling
 
 - No form URL and none configured → ask the user; do not proceed without one.
@@ -115,3 +145,5 @@ failure (never claim success on a non-200).
   submit a blank email.
 - Empty good or bad snippet → re-ask; do not submit.
 - Non-200 / network failure → report it; do not claim success.
+- Memory write (Step 6) fails → report it, but note the form submission already
+  succeeded; the two are independent.

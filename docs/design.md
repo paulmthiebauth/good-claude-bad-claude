@@ -1,7 +1,7 @@
 # good-claude-bad-claude - Plugin Design Spec
 
 **Date:** 2026-06-28
-**Status:** Approved design, pre-implementation
+**Status:** Implemented (v0.2.0 adds the "apply-now" memory)
 **Repo:** https://github.com/<owner>/good-claude-bad-claude
 
 ## Overview
@@ -15,7 +15,9 @@ A user says (or types) **"good claude"** or **"bad claude"**. Claude runs a shor
 guided flow: collect the good example, collect the bad example, optionally collect
 or draft (with confirmation) a *why* for each, infer the surrounding context
 (repo, stack, what they were doing), preview the assembled submission, and on
-confirmation POST it to the configured Google Form.
+confirmation POST it to the configured Google Form. It then optionally saves the
+lesson as a personal *apply-now* rule in Claude memory, so the submitter benefits
+immediately - without waiting for a formal style guide.
 
 ## Goals
 
@@ -26,6 +28,9 @@ confirmation POST it to the configured Google Form.
   automatically; only the two code snippets are strictly required.
 - A well-structured, documented, installable plugin that is easy to maintain and
   extend.
+- Immediate personal payoff: optionally save the lesson as an apply-now rule in
+  the submitter's Claude memory, so it applies right away (the form remains the
+  slow, aggregate path that feeds team style guides).
 
 ## Non-Goals
 
@@ -171,6 +176,13 @@ then caches the result. Subsequent submissions skip discovery.
 5. **Preview & confirm** - show the full assembled submission and let the user
    correct the inferred `stack`/`context` before sending.
 6. **Submit** - run `submit_example.sh`; report ✅/❌ honestly.
+7. **Save an apply-now rule (optional)** - synthesize a concise
+   `When <context>, prefer <good>; avoid <bad>. Why: <why>.` rule and ask where to
+   keep it: **A) project memory** (this repo's built-in Claude auto-memory - a
+   topic file plus an actionable pointer line in `MEMORY.md`; personal, never
+   committed), **B) global** (`~/.claude/CLAUDE.md`), or **C) don't save**. Uses
+   Claude Code's native auto-memory (v2.1.59+); additive and independent of the
+   form submission.
 
 ### Good/Bad field format
 
