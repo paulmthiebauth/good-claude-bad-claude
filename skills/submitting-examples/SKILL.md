@@ -1,6 +1,7 @@
 ---
 name: submitting-examples
-description: Use when the user says "good claude" or "bad claude", or runs /good-claude or /bad-claude. Captures a good vs bad code example through a short guided flow, submits it to the configured Google Form, and optionally saves a personal "apply-now" rule to Claude memory so the lesson takes effect immediately.
+description: Use when the user says "good claude" or "bad claude", or runs /good-claude or /bad-claude. Captures a good vs bad code example and submits it to the team's Google Form.
+allowed-tools: Bash(git *), Bash(basename *), Bash(cat *), Bash(ls *)
 ---
 
 # Submitting Good/Bad Code Examples
@@ -12,41 +13,21 @@ submitting, you can optionally save a personal "apply-now" rule to your Claude
 memory so the lesson takes effect immediately, without waiting for a formal style
 guide (see Step 6).
 
-## Step 0 - Ensure config exists (setup + discovery)
+## Environment (injected at load)
 
-Read `${CLAUDE_PLUGIN_DATA}/config.json`.
+- Existing config: !`cat "${CLAUDE_PLUGIN_DATA}/config.json" 2>/dev/null || echo "MISSING"`
+- Repo: !`basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"`
+- Stack signal files: !`ls -1 Gemfile package.json go.mod pyproject.toml requirements.txt Cargo.toml pom.xml 2>/dev/null || true`
+- Git email: !`git config user.email 2>/dev/null || echo "(none)"`
 
-- If it exists and contains `form_url` and all five `fields`, use it. Skip to Step 1.
-- If it is missing or incomplete, run setup:
-  1. Determine the form URL. If the user configured `form_url` (plugin user config)
-     and it is available, use it. Otherwise ask: "What's the URL of the Google Form
-     to submit examples to?"
-  2. Fetch the form's HTML:
-     `curl -sL "<viewform-url>"` (a `/viewform` URL is expected).
-  3. In the HTML, find the `FB_PUBLIC_LOAD_DATA_` array. For each question extract
-     its visible text and its `entry.<id>` (the numeric id in the question's field
-     descriptor). Also note whether the form collects email (a `type="email"`
-     input is present).
-  4. Map questions to fields by keyword on the question text:
-     `repository` → `repo`, `language`/`stack` → `stack`, `context` → `context`,
-     `good` → `good`, `bad` → `bad`.
-  5. If any field is unmatched or ambiguous, show the user the discovered questions
-     and ask which maps to which. Do not guess silently.
-  6. Normalize the form URL to its `/formResponse` endpoint and write
-     `${CLAUDE_PLUGIN_DATA}/config.json`:
-     ```json
-     {
-       "form_url": "https://docs.google.com/forms/d/e/<id>/formResponse",
-       "collects_email": true,
-       "fields": {
-         "repo": "entry.<id>",
-         "stack": "entry.<id>",
-         "context": "entry.<id>",
-         "good": "entry.<id>",
-         "bad": "entry.<id>"
-       }
-     }
-     ```
+## Step 0 - Ensure config exists
+
+Use the injected **Existing config** above.
+
+- If it is valid JSON with `form_url` and all five `fields`, use it and skip to Step 1.
+- If it is `MISSING` or incomplete, run the one-time setup in
+  [references/discovery.md](references/discovery.md) — it writes
+  `${CLAUDE_PLUGIN_DATA}/config.json` — then continue.
 
 ## Step 1 - Collect the two snippets
 
@@ -76,14 +57,22 @@ WHY:
 <the why, or (to be inferred)>
 ```
 
+For a calibrated *why* and the Step 6 rule, see
+[examples/worked-example.md](examples/worked-example.md).
+
 ## Step 3 - Infer the context fields
 
-- `repo`: `basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"`
-- `stack`: from repo signals - `Gemfile` → Ruby/Rails, `package.json` → JS/React,
-  `go.mod` → Go, `pyproject.toml`/`requirements.txt` → Python, etc.
+Use the injected environment above:
+
+- `repo`: the injected **Repo** value.
+- `stack`: map the injected **Stack signal files** - `Gemfile` → Ruby/Rails,
+  `package.json` → JS/React, `go.mod` → Go, `pyproject.toml`/`requirements.txt`
+  → Python, `Cargo.toml` → Rust, etc.
 - `context`: a short label such as "rails testing" or "react testing", inferred
   from the snippet and what the user is doing.
-- `email`: `git config user.email` (used only if `collects_email` is true).
+- `email`: the injected **Git email** (used only if `collects_email` is true).
+  If it is `(none)` and the form collects email, ask the user; never submit a
+  blank email.
 
 ## Step 4 - Preview & confirm
 
@@ -135,15 +124,6 @@ submitter an *immediate* benefit: a personal rule Claude applies right away.
    missing); skip if an identical line already exists.
    **On C:** do nothing.
 
-This step is additive: it never changes or blocks the Step 5 form submission.
-
-## Error handling
-
-- No form URL and none configured → ask the user; do not proceed without one.
-- Discovery cannot map a field → ask the user to map it; do not guess.
-- No `git config user.email` and the form collects email → ask the user; never
-  submit a blank email.
-- Empty good or bad snippet → re-ask; do not submit.
-- Non-200 / network failure → report it; do not claim success.
-- Memory write (Step 6) fails → report it, but note the form submission already
-  succeeded; the two are independent.
+This step is additive: it never changes or blocks the Step 5 form submission. If
+the memory write fails, say so — the form submission already succeeded and the
+two are independent.
